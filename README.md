@@ -1,6 +1,4 @@
-# mst-algorithms-9.-Ecological-network
- Comparative analysis of MST algorithms on [category] networks
- # Ecological Networks & Minimum Spanning Tree Algorithms
+# Ecological Networks & Minimum Spanning Tree Algorithms
 
 ##  Project Overview
 
@@ -49,9 +47,15 @@ We worked with 5 ecological network datasets:
 - Nodes here act as a sort of grid where each node has connections to its immediate neighbours above, below and to either side of it.
 - weights are assigned randomly (1 & -1).
 - The graph was created purely for science and doesn’t have any real world meaning
-## *Dubcova1*
-## *GaAsH6*
-## *FullChip*
+## *Dubcova1*:
+-nodes represent points/ variables in a 2D/3D space
+-edges show whether or not they interact or affect each other 
+-weights show how much they interact or affect each other 
+-Dubcova1 specifically comes from a fluid flow/heat transfer problem simulation
+## *GaAsH6*:
+- The GaAsH₆ dataset models quantum interactions between atomic orbitals in a Ga-As-H molecule using nodes, edges, and weighted connections.
+## *FullChip*:
+- The FullChip dataset represents microchip layouts, with nodes as components (e.g., transistors) and edges as their connections.
 
 Each dataset was represented as a weighted undirected graph.
 
@@ -61,3 +65,6 @@ Each dataset was represented as a weighted undirected graph.
 - Biodiversity assessment: MSTs can be used for Biodiversity assessment to simplify the interaction networks and remove redundent interactions ,also it helps to find the keystone species, whose removal impacts the system greatly.
 - Ecosystem Modeling: MSTs contribute in the ecosystem modeling as it highlights the fundamental structural backbone of the system and shows the main lines through which energy must pass through from producers to top predators. 
 - Neural Network Models: a streamlined neural network that keeps the vital local connections for processing spatial information while cutting out unnecessary links to stay efficient.
+- It’s used to optimize chip design—improving speed and efficiency in real devices like smartphones.
+- It helps scientists design advanced materials like high-efficiency solar cells by simulating electron behavior.
+- 2D/3D scientific/engineering simulations: simulating liquid flow, solving partial differential equations, etc
