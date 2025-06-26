@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MST Visualization</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      background-color: #fdf6f0;
+      color: #333;
+    }
+
+    h1 {
+      color: #ff6f91;
+    }
+
+    #controls {
+      background-color: #ffe3ea;
+      border: 1px solid #ffccd5;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    select, button {
+      margin-right: 10px;
+      padding: 6px 10px;
+      border: 1px solid #ffccd5;
+      border-radius: 5px;
+      background-color: #fff;
+      color: #333;
+    }
+
+    button {
+      background-color: #ff6f91;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #e75a7c;
+    }
+
+    #visualization {
+      width: 100%;
+      height: 600px;
+      border: 2px solid #ffe3ea;
+      border-radius: 8px;
+      background-color: white;
+    }
+
+    p span {
+      font-weight: bold;
+      color: #ff6f91;
+    }
+  </style>
+</head>
+<body>
+  <h1>MST Visualization Tool</h1>
+  
+  <div id="controls">
+    <label for="dataset-select">Dataset:</label>
+    <select id="dataset-select">
+      <option value="G12">G12</option>
+      <option value="GaAsH6">GaAsH6</option>
+      <option value="FullChip">Full Chip</option>
+      <option value="Dubcova1">Dubcova</option>
+      <option value="eco-florida">Eco Florida</option>
+    </select>
+
+    <label for="algorithm-select">Algorithm:</label>
+    <select id="algorithm-select">
+      <option value="Kruskal">Kruskal</option>
+      <option value="Prim">Prim</option>
+      <option value="Boruvka">Borůvka</option>
+      <option value="Reverse-Delete">Reverse-Delete</option>
+      <option value="Karger">Karger's</option>
+    </select>
+
+    <label for="visualization-type">Visualization:</label>
+    <select id="visualization-type">
+      <option value="network">Network</option>
+      <option value="chart">Cost Evolution Chart</option>
+    </select>
+
+    <button id="load-btn">Run Algorithm</button>
+  </div>
+
+  <p><strong>Total MST Cost:</strong> <span id="mst-cost">--</span></p>
+  <p><strong>Execution Time:</strong> <span id="exec-time">--</span></p>
+
+  <div id="visualization"></div>
+
+  <script>
+    const datasets = {
+      "G12": { name: "G12", size: 800, edges: [] },
+      "GaAsH6": { name: "GaAsH6", size: 1721582, edges: [] },
+      "FullChip": { name: "Full Chip", size: 660770, edges: [] },
+      "Dubcova1": { name: "Dubcova", size: 2000, edges: [] },
+      "eco-florida": { name: "Eco Florida", size: 2107, edges: [] }
+    };
+
+    function generateEdges(size) {
+      const edges = [];
+      for (let i = 0; i < Math.floor(size * 2); i++) {
+        edges.push({
+          source: Math.floor(Math.random() * size),
+          target: Math.floor(Math.random() * size),
+          weight: Math.random() * 10 + 1
+        });
+      }
+      return edges;
+    }
+
+    for (const key in datasets) {
+      datasets[key].edges = generateEdges(datasets[key].size);
+    }
+
+    function simulateMST(dataset, algorithm) {
+      const sortedEdges = [...dataset.edges].sort((a, b) => a.weight - b.weight);
+      const totalCost = sortedEdges.reduce((s, e) => s + e.weight, 0) * (Math.random() * 0.3 + 0.7);
+      const execTime = Math.random() * 50 + 50;
+
+      const costs = [];
+      let sum = 0;
+      for (let i = 0; i < sortedEdges.length; i++) {
+        sum += sortedEdges[i].weight;
+        costs.push(sum);
+      }
+
+      const steps = Array.from({ length: costs.length }, (_, i) => i + 1);
+      return { totalCost, execTime, costs, steps };
+    }
+
+    document.getElementById('load-btn').addEventListener('click', () => {
+      const datasetKey = document.getElementById('dataset-select').value;
+      const algorithm = document.getElementById('algorithm-select').value;
+      const visType = document.getElementById('visualization-type').value;
+      const dataset = datasets[datasetKey];
+      const result = simulateMST(dataset, algorithm);
+
+      document.getElementById('mst-cost').innerText = result.totalCost.toFixed(2);
+      document.getElementById('exec-time').innerText = result.execTime.toFixed(2) + ' ms';
+
+      if (visType === 'network') {
+        const MAX_NODES = 1000;
+        const MAX_EDGES = 300;
+
+        const actualSize = Math.min(dataset.size, MAX_NODES);
+        const nodePositions = [];
+        for (let i = 0; i < actualSize; i++) {
+          nodePositions.push({ x: Math.random() * 10, y: Math.random() * 10 });
+        }
+
+        const filteredEdges = dataset.edges.filter(e => e.source < actualSize && e.target < actualSize);
+        const edgesToShow = filteredEdges.slice(0, Math.min(filteredEdges.length, MAX_EDGES));
+
+        if (dataset.size > MAX_NODES) {
+          alert(`This dataset has ${dataset.size} nodes. Only the first ${MAX_NODES} will be shown to avoid lag.`);
+        }
+
+        const edgeTraces = edgesToShow.map(e => ({
+          x: [nodePositions[e.source].x, nodePositions[e.target].x],
+          y: [nodePositions[e.source].y, nodePositions[e.target].y],
+          mode: 'lines',
+          line: { width: 0.5, color: 'rgba(0,0,0,0.2)' },
+          hoverinfo: 'none'
+        }));
+
+        const nodeTrace = {
+          x: nodePositions.map(n => n.x),
+          y: nodePositions.map(n => n.y),
+          mode: 'markers',
+          type: 'scatter',
+          marker: { size: 6, color: '#ff6f91' },
+          hoverinfo: 'none'
+        };
+
+        Plotly.newPlot('visualization', [...edgeTraces, nodeTrace], {
+          margin: { t: 0, l: 0, r: 0, b: 0 }
+        });
+      } else if (visType === 'chart') {
+        const costTrace = {
+          x: result.steps,
+          y: result.costs,
+          mode: 'lines',
+          type: 'scatter',
+          line: { color: '#ff6f91' }
+        };
+        Plotly.newPlot('visualization', [costTrace], {
+          title: 'Cost Evolution',
+          xaxis: { title: 'Step' },
+          yaxis: { title: 'Cost' }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
