@@ -27,7 +27,7 @@ We implemented the following five MST algorithms:
    - good for parallel processing
 4. *Reverse-Delete Algorithm*
    - Sorts all edges descendingly and starts removing the heaviest edges as long as it doesn't disconnect the graph
-   - Time Complexity: O(E³)
+   - Time Complexity: O(E^2)
    - Space Complexity: O(V+E)
 5. *Karger’s Algorithm (MST variant)*
    - A randomized algorithm that repeatedly contracts edges to shrink the graph, giving an approximate solution to the MST. It’s fast and clever, but its results can vary each time due to its randomness.
